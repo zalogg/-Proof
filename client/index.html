@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas</title>
+</head>
+<body>
+    <h1>Películas</h1>
+    <div id="movies"></div>
+    
+    <h2>Buscar película por ID</h2>
+    <input type="number" id="movieId" placeholder="Ingrese ID de la película">
+    <button onclick="getMovieById()">Buscar</button>
+    <div id="movie"></div>
+
+    <script>
+        // Fetch all movies
+        async function fetchMovies() {
+            try {
+                const response = await fetch('http://localhost:5000/pelis');
+                const movies = await response.json();
+                const moviesDiv = document.getElementById('movies');
+                moviesDiv.innerHTML = '<h2>Lista de películas</h2>';
+                movies.forEach(movie => {
+                    const movieElement = document.createElement('div');
+                    movieElement.textContent = `ID: ${movie.id}, Título: ${movie.title}`;
+                    moviesDiv.appendChild(movieElement);
+                });
+            } catch (error) {
+                console.error('Error al obtener las películas:', error);
+            }
+        }
+
+        // Fetch movie by ID
+        async function getMovieById() {
+            const movieId = document.getElementById('movieId').value;
+            try {
+                const response = await fetch(`http://localhost:5000/pelis/${movieId}`);
+                if (!response.ok) {
+                    throw new Error('Película no encontrada');
+                }
+                const movie = await response.json();
+                const movieDiv = document.getElementById('movie');
+                movieDiv.innerHTML = `<h3>Película encontrada</h3>ID: ${movie.id}, Título: ${movie.title}`;
+            } catch (error) {
+                console.error('Error al obtener la película:', error);
+                const movieDiv = document.getElementById('movie');
+                movieDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            }
+        }
+
+        // Initialize
+        fetchMovies();
+    </script>
+</body>
+</html>
